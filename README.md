@@ -7,6 +7,36 @@ FinanceMonitor is now set up as a full-stack MVP:
 - Persistent transaction storage
 - Dashboard and reports from live data
 
+## Deploy as separate apps
+
+Do not split this into separate repos unless you want to.
+
+This repo is already separated by deployment target:
+- **Frontend for Vercel:** repo root
+- **Backend for Render/Railway:** [backend-production](backend-production)
+
+Files added for this:
+- [vercel.json](vercel.json)
+- [.vercelignore](.vercelignore)
+- [render.yaml](render.yaml)
+- [public/runtime-config.js](public/runtime-config.js)
+
+Before deploying the frontend, replace the placeholder in [public/runtime-config.js](public/runtime-config.js) with your real backend URL:
+
+```js
+window.__APP_CONFIG__ = {
+	apiBaseUrl: 'https://your-backend-url/api/v1',
+};
+```
+
+Example:
+
+```js
+window.__APP_CONFIG__ = {
+	apiBaseUrl: 'https://finance-monitor-api.onrender.com/api/v1',
+};
+```
+
 ## Local development
 
 Frontend:
