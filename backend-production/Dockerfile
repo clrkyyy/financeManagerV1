@@ -1,9 +1,13 @@
 # Multi-stage build for optimized production image
 
 # Stage 1: Build
-FROM node:20-alpine AS builder
+FROM node:20-bookworm-slim AS builder
 
 WORKDIR /app
+
+RUN apt-get update && \
+  apt-get install -y --no-install-recommends openssl ca-certificates && \
+  rm -rf /var/lib/apt/lists/*
 
 # Copy package files
 COPY package*.json ./
@@ -27,14 +31,16 @@ RUN npm run build
 RUN npm prune --omit=dev
 
 # Stage 2: Production
-FROM node:20-alpine
+FROM node:20-bookworm-slim
 
-# Install dumb-init for proper signal handling
-RUN apk add --no-cache dumb-init
+# Install runtime dependencies for Prisma and proper signal handling
+RUN apt-get update && \
+  apt-get install -y --no-install-recommends dumb-init openssl ca-certificates && \
+  rm -rf /var/lib/apt/lists/*
 
 # Create non-root user
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodejs -u 1001
+RUN groupadd --gid 1001 nodejs && \
+  useradd --uid 1001 --gid 1001 --create-home --shell /usr/sbin/nologin nodejs
 
 WORKDIR /app
 
